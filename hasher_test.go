@@ -228,3 +228,29 @@ func TestHashFiles(t *testing.T) {
 		})
 	}
 }
+
+func checkHashSet(t *testing.T, hs *HashSet) {
+	t.Helper()
+	require.Equal(t, "12345", (*hs)[intoto.AlgorithmSHA1])
+	require.Equal(t, "567788", (*hs)[intoto.AlgorithmSHA256])
+}
+
+func TestNewHashSet(t *testing.T) {
+	t.Parallel()
+	t.Run("string-string", func(t *testing.T) {
+		t.Parallel()
+		hs := NewHashSet(map[string]string{
+			"sha1":   "12345",
+			"sha256": "567788",
+		})
+		checkHashSet(t, hs)
+	})
+	t.Run("intoto-string", func(t *testing.T) {
+		t.Parallel()
+		hs := NewHashSet(map[intoto.HashAlgorithm]string{
+			intoto.AlgorithmSHA1:   "12345",
+			intoto.AlgorithmSHA256: "567788",
+		})
+		checkHashSet(t, hs)
+	})
+}

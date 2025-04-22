@@ -26,6 +26,15 @@ func New() *Hasher {
 	}
 }
 
+// NewHashSet returns a new hashset from any map of string-like things
+func NewHashSet[K ~string, T ~string](data map[K]T) *HashSet {
+	ret := HashSet{}
+	for algo, val := range data {
+		ret[intoto.HashAlgorithm(algo)] = string(val)
+	}
+	return &ret
+}
+
 // Hasher is an object that has methods to hash data.
 type Hasher struct {
 	Options Options
