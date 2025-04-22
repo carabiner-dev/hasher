@@ -3,7 +3,11 @@
 
 package hasher
 
-import intoto "github.com/in-toto/attestation/go/v1"
+import (
+	"fmt"
+
+	intoto "github.com/in-toto/attestation/go/v1"
+)
 
 type Options struct {
 	Algorithms  []intoto.HashAlgorithm
@@ -21,4 +25,20 @@ var defaultOptions = Options{
 	// MaxParallel controls how many hashing processes we run at the
 	// same time.
 	MaxParallel: 4,
+}
+
+type OptFn func(*Options) error
+
+func WithAlgorithms[T ~string](algos []T) OptFn {
+	return func(o *Options) error {
+		o.Algorithms = []intoto.HashAlgorithm{}
+		for _, algoString := range algos {
+			if _, ok := HasherFactory[intoto.HashAlgorithm(algoString)]; ok {
+				o.Algorithms = append(o.Algorithms, intoto.HashAlgorithm(algoString))
+			} else {
+				return fmt.Errorf("unknown algorithm %q", algoString)
+			}
+		}
+		return nil
+	}
 }

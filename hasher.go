@@ -71,7 +71,7 @@ func (h *Hasher) HashFiles(paths []string) (*FileHashSet, error) {
 	for i, path := range paths {
 		f, err := os.Open(path)
 		if err != nil {
-			return nil, fmt.Errorf("opening file")
+			return nil, fmt.Errorf("opening file: %w", err)
 		}
 		readers[i] = f
 	}
@@ -129,15 +129,22 @@ func (h *Hasher) HashReaders(readers []io.Reader) (*HashSetList, error) {
 // hashReader hashes the data stream read from r into the configured
 // algorithms. While IO writing is paralelized, the hash computation is
 // done serially as threads are controlled in the calling functions.
-func (h *Hasher) hashReader(r io.Reader) (*HashSet, error) {
-	if len(h.Options.Algorithms) == 0 {
+func (h *Hasher) hashReader(r io.Reader, fn ...OptFn) (*HashSet, error) {
+	opts := h.Options
+	for _, f := range fn {
+		if err := f(&opts); err != nil {
+			return nil, err
+		}
+	}
+	fmt.Printf("Optios: %+v", opts)
+	if len(opts.Algorithms) == 0 {
 		return nil, fmt.Errorf("no algorithms configured in hasher")
 	}
 	ret := HashSet{}
 	var mutex sync.Mutex
 	writers := []io.Writer{}
 
-	for _, algo := range h.Options.Algorithms {
+	for _, algo := range opts.Algorithms {
 		cryptoHasher := HasherFactory.GetHasher(algo)
 		if cryptoHasher == nil {
 			return nil, fmt.Errorf("no hasher found for %q", algo)
@@ -153,7 +160,7 @@ func (h *Hasher) hashReader(r io.Reader) (*HashSet, error) {
 
 	for i, w := range writers {
 		mutex.Lock()
-		ret[h.Options.Algorithms[i]] = fmt.Sprintf("%x", w.(hash.Hash).Sum(nil)) //nolint:errcheck
+		ret[opts.Algorithms[i]] = fmt.Sprintf("%x", w.(hash.Hash).Sum(nil)) //nolint:errcheck
 		mutex.Unlock()
 	}
 
