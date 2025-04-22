@@ -10,9 +10,8 @@ import (
 	"crypto/sha256"
 	"hash"
 
-	"golang.org/x/crypto/sha3"
-
 	intoto "github.com/in-toto/attestation/go/v1"
+	"golang.org/x/crypto/sha3"
 )
 
 // HasherFactoryMap is a map that can create hash.Hash objects for

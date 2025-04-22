@@ -39,10 +39,11 @@ func TestHSToResourceDescriptor(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			rd := tc.hs.ToResourceDescriptor()
-			require.Len(t, rd.Digest, len(tc.expect.Digest))
+			require.Len(t, rd.GetDigest(), len(tc.expect.GetDigest()))
 			for algo, value := range *tc.hs {
-				require.Equal(t, tc.expect.Digest[string(algo)], value)
+				require.Equal(t, tc.expect.GetDigest()[string(algo)], value)
 			}
 		})
 	}
@@ -89,11 +90,12 @@ func TestHSLToResourceDescriptors(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			rds := tc.hsl.ToResourceDescriptors()
 			require.Len(t, rds, len(tc.expect))
 			for i, set := range *tc.hsl {
 				for algo, value := range set {
-					require.Equal(t, tc.expect[i].Digest[string(algo)], value)
+					require.Equal(t, tc.expect[i].GetDigest()[string(algo)], value)
 				}
 			}
 		})
@@ -147,13 +149,14 @@ func TestFHSToResourceDescriptors(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			rds := tc.hsl.ToResourceDescriptors()
 			require.Len(t, rds, len(tc.expect))
 			i := 0
 			for path, set := range *tc.hsl {
 				for algo, value := range set {
-					require.Equal(t, tc.expect[i].Digest[string(algo)], value)
-					require.Equal(t, tc.expect[i].Uri, path)
+					require.Equal(t, tc.expect[i].GetDigest()[string(algo)], value)
+					require.Equal(t, tc.expect[i].GetUri(), path)
 				}
 				i++
 			}

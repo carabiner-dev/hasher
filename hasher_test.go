@@ -206,7 +206,7 @@ func TestHashFiles(t *testing.T) {
 				require.NoError(t, err)
 
 				require.NoError(t, os.WriteFile(f.Name(), []byte(d), os.FileMode(0o644)))
-				f.Close()
+				require.NoError(t, f.Close())
 				files[i] = f.Name()
 			}
 

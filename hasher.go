@@ -51,7 +51,7 @@ func closeFiles(readers []io.Reader) {
 
 		f, ok := r.(*os.File)
 		if ok {
-			f.Close()
+			f.Close() //nolint:errcheck,gosec
 		}
 	}
 }
@@ -69,7 +69,7 @@ func (h *Hasher) HashFiles(paths []string) (*FileHashSet, error) {
 	defer closeFiles(readers)
 
 	for i, path := range paths {
-		f, err := os.Open(path)
+		f, err := os.Open(path) //nolint:gosec
 		if err != nil {
 			return nil, fmt.Errorf("opening file: %w", err)
 		}
@@ -160,7 +160,11 @@ func (h *Hasher) hashReader(r io.Reader, fn ...OptFn) (*HashSet, error) {
 
 	for i, w := range writers {
 		mutex.Lock()
-		ret[opts.Algorithms[i]] = fmt.Sprintf("%x", w.(hash.Hash).Sum(nil)) //nolint:errcheck
+		hshr, ok := w.(hash.Hash)
+		if !ok {
+			return nil, fmt.Errorf("invalid hasher")
+		}
+		ret[opts.Algorithms[i]] = fmt.Sprintf("%x", hshr.Sum(nil))
 		mutex.Unlock()
 	}
 

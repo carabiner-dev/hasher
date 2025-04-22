@@ -13,16 +13,18 @@ import (
 // VerifyReader compares a set of hashes against a reader data. If all
 // match then it returns true. If a hash mismatches, it returns false.
 func (h *Hasher) VerifyReader(r io.Reader, set *HashSet) (bool, error) {
-	var algos []intoto.HashAlgorithm
+	algos := make([]intoto.HashAlgorithm, len(*set))
+	i := 0
 	for a := range *set {
-		algos = append(algos, a)
+		algos[i] = a
+		i++
 	}
 	control, err := h.hashReader(r, WithAlgorithms(algos))
 	if err != nil {
-		return false, fmt.Errorf("hashing stream: %s", err)
+		return false, fmt.Errorf("hashing stream: %w", err)
 	}
 
-	var errs = []error{}
+	errs := []error{}
 	for algo := range *control {
 		if (*set)[algo] != (*control)[algo] {
 			errs = append(errs, fmt.Errorf("%s hash does not match", algo))
