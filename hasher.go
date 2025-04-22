@@ -145,7 +145,6 @@ func (h *Hasher) hashReader(r io.Reader, fn ...OptFn) (*HashSet, error) {
 			return nil, err
 		}
 	}
-	fmt.Printf("Optios: %+v", opts)
 	if len(opts.Algorithms) == 0 {
 		return nil, fmt.Errorf("no algorithms configured in hasher")
 	}
