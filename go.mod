@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/in-toto/attestation v1.1.2
 	github.com/nozzle/throttler v0.0.0-20180817012639-2ea982251481
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.0
 	golang.org/x/crypto v0.40.0
 )
 
