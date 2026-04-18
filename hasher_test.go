@@ -122,7 +122,7 @@ func TestHashReaders(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
-			readers := []io.Reader{}
+			readers := make([]io.Reader, 0, len(tc.data))
 			for _, s := range tc.data {
 				readers = append(readers, strings.NewReader(s))
 			}

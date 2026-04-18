@@ -59,5 +59,4 @@ jobs:
 
     - name: Test
       run: |
-        go get -d ./...
-        go test -v ./...
+        go test -v ./... --cover

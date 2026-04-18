@@ -152,13 +152,16 @@ func TestFHSToResourceDescriptors(t *testing.T) {
 			t.Parallel()
 			rds := tc.hsl.ToResourceDescriptors()
 			require.Len(t, rds, len(tc.expect))
-			i := 0
+			expectByURI := map[string]*intoto.ResourceDescriptor{}
+			for _, rd := range tc.expect {
+				expectByURI[rd.GetUri()] = rd
+			}
 			for path, set := range *tc.hsl {
+				exp, ok := expectByURI[path]
+				require.True(t, ok, "no expected descriptor for %s", path)
 				for algo, value := range set {
-					require.Equal(t, tc.expect[i].GetDigest()[string(algo)], value)
-					require.Equal(t, tc.expect[i].GetUri(), path)
+					require.Equal(t, exp.GetDigest()[string(algo)], value)
 				}
-				i++
 			}
 		})
 	}
