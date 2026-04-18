@@ -1,6 +1,6 @@
 module github.com/carabiner-dev/hasher
 
-go 1.25.0
+go 1.25.9
 
 require (
 	github.com/in-toto/attestation v1.2.0
