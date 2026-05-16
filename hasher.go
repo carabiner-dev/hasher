@@ -111,19 +111,26 @@ func (h *Hasher) HashReaders(readers []io.Reader) (*HashSetList, error) {
 	ret := make(HashSetList, len(readers))
 	errs := []error{}
 
-	var mutex sync.Mutex
+	var (
+		retMu sync.Mutex
+		errMu sync.Mutex
+	)
 	t := throttler.New((4), len(readers))
 	for i, r := range readers {
 		go func() {
-			hashes, err := h.hashReader(r)
+			var err error
+			defer func() { t.Done(err) }()
+			var hashes *HashSet
+			hashes, err = h.hashReader(r)
 			if err != nil {
+				errMu.Lock()
 				errs = append(errs, err)
+				errMu.Unlock()
 				return
 			}
-			mutex.Lock()
+			retMu.Lock()
 			ret[i] = *hashes
-			mutex.Unlock()
-			t.Done(err)
+			retMu.Unlock()
 		}()
 		t.Throttle()
 	}
