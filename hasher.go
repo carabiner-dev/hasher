@@ -115,7 +115,7 @@ func (h *Hasher) HashReaders(readers []io.Reader) (*HashSetList, error) {
 		retMu sync.Mutex
 		errMu sync.Mutex
 	)
-	t := throttler.New((4), len(readers))
+	t := throttler.New(4, len(readers))
 	for i, r := range readers {
 		go func() {
 			var err error
